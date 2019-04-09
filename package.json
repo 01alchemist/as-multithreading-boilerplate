@@ -1,0 +1,39 @@
+{
+  "name": "as-multithreading-boilerplate",
+  "version": "1.0.0",
+  "description": "This repo contains minimal boilerplate code for AssemblyScript multithreading with shared memory",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --experimental-wasm-threads --experimental-worker --wasm-shared-code --require ts-node/register ./src/node/index.ts",
+    "debug": "node --inspect-brk --experimental-worker --require ts-node/register ./src/node/index.ts",
+    "compile": "./scripts/compile.ts --sharedMemory=256",
+    "asbuild:untouched": "yarn compile src/assembly/index.ts -o build/untouched.wasm --debug",
+    "asbuild:optimized": "yarn compile src/assembly/index.ts -o build/optimized.wasm --optimize",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/01alchemist/as-multithreading-boilerplate.git"
+  },
+  "keywords": [
+    "AssemblyScript",
+    "WebAssembly"
+  ],
+  "author": "Nidin Vinayakan <01@01alchemist.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/01alchemist/as-multithreading-boilerplate/issues"
+  },
+  "homepage": "https://github.com/01alchemist/as-multithreading-boilerplate#readme",
+  "devDependencies": {
+    "@types/node": "^11.13.0",
+    "@types/webassembly-js-api": "^0.0.3",
+    "assemblyscript": "AssemblyScript/assemblyscript",
+    "chalk": "^2.4.2",
+    "dotenv": "^7.0.0",
+    "minimist": "^1.2.0",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.4.1"
+  }
+}
