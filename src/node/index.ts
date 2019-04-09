@@ -38,6 +38,5 @@ try {
 
 subChannel.port2.on('message', value => {
   console.log('[main] received:', value)
+  setTimeout(() => process.exit(0), 1000)
 })
-
-setTimeout(() => {}, 10000)

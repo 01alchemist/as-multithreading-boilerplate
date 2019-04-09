@@ -4,7 +4,7 @@
   "description": "This repo contains minimal boilerplate code for AssemblyScript multithreading with shared memory",
   "main": "index.js",
   "engine": {
-    "node": "10.5.0",
+    "node": "10.5.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
