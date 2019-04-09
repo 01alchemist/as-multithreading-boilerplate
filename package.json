@@ -9,7 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --experimental-wasm-threads --experimental-worker --require ts-node/register ./src/node/index.ts",
-    "debug": "node --inspect-brk --experimental-worker --require ts-node/register ./src/node/index.ts",
+    "debug": "node --inspect-brk --experimental-wasm-threads --experimental-worker --require ts-node/register ./src/node/index.ts",
     "compile": "./scripts/compile.ts --sharedMemory=256",
     "asbuild:untouched": "yarn compile src/assembly/index.ts -o build/untouched.wasm --debug",
     "asbuild:optimized": "yarn compile src/assembly/index.ts -o build/optimized.wasm --optimize",
