@@ -14,7 +14,6 @@ const base = path.resolve(__dirname, '../')
 ;(async () => {
   try {
     await launch({
-      dontExit: true,
       cwd: options.cwd,
       cmds: [
         'asc',
