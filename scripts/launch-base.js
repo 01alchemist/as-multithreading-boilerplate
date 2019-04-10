@@ -1,22 +1,22 @@
-// tslint:disable
-const path = require('path')
-const minimist = require('minimist')
 const spawn = require('child_process').spawn
+const minimist = require('minimist')
+const path = require('path')
 const fs = require('fs')
+
 const baseDir = path.resolve(__dirname, '../')
 let envPath = `${baseDir}/env/${process.env.USER}.env`
 if (!fs.existsSync(envPath)) {
   envPath = `${baseDir}/.env`
 }
 
-export const EnvFile = envPath
+const EnvFile = envPath
 
 console.log(`Loading env vars from: ${envPath}`)
 require('dotenv').config({
   path: envPath,
 })
 
-export default async function launch(options?) {
+async function launch(options) {
   options = options || minimist(process.argv.slice(2))
   if (options.env) {
     const env =
@@ -60,7 +60,7 @@ export default async function launch(options?) {
     }
   }
 
-  process.on('SIGINT', <any>exit)
+  process.on('SIGINT', exit)
 
   return new Promise(function(resolve, reject) {
     let lastData = ''
@@ -85,4 +85,9 @@ export default async function launch(options?) {
       }
     })
   })
+}
+
+module.exports = {
+  EnvFile,
+  launch,
 }

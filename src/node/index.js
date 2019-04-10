@@ -15,6 +15,10 @@ const {
 const os = require('os')
 const { Commands, Events, sleep } = require('./common')
 
+const numWorker = os.cpus().length - 1
+let numWorkerReady = 0
+let _resolve, _reject
+let context = null
 let workers = []
 let numTasksDone = 0
 const tasks = [
@@ -23,10 +27,68 @@ const tasks = [
 ]
 const totalTasks = tasks.length
 
+function createWorker(id) {
+  const worker = new Worker(path.resolve(__dirname, './worker.js'))
+  const subChannel = new MessageChannel()
+  try {
+    subChannel.port2.on('message', onWorkerMessage)
+    return { id, worker, subChannel: subChannel, busy: true }
+  } catch (e) {
+    console.error(e)
+    throw e
+  }
+}
+
+async function initWorker(id, context) {
+  try {
+    const workerInfo = workers[id]
+    workerInfo.worker.postMessage(
+      {
+        command: Commands.INIT,
+        id,
+        data: {
+          port: workerInfo.subChannel.port1,
+          memory: workerInfo.wasmMemory,
+          context,
+        },
+      },
+      [workerInfo.subChannel.port1]
+    )
+  } catch (e) {
+    console.error(e)
+    return reject()
+  }
+}
+
+async function onWorkerMessage(value) {
+  console.log('[main] received:', value)
+  const { event, id } = value
+  const workerInfo = workers[id]
+  switch (event) {
+    case Events.INITED:
+      numWorkerReady++
+      if (value.context) {
+        context = value.context
+      }
+      if (numWorkerReady === numWorker) {
+        _resolve()
+      } else {
+        initWorker(id + 1, context)
+      }
+      break
+    case Events.FINISHED:
+      numTasksDone++
+      if (numTasksDone === totalTasks) {
+        console.log(chalk.green('All tasks done'))
+        process.exit(0)
+      }
+      break
+  }
+  workerInfo.busy = false
+}
+
 async function initialize() {
   console.log('Initializing....')
-  let numReady = 0
-  const numCPU = os.cpus().length - 1
   const wasmMemory = new WebAssembly.Memory({
     initial: 1,
     maximum: 256,
@@ -34,49 +96,13 @@ async function initialize() {
   })
 
   return new Promise(async (resolve, reject) => {
-    for (let i = 0; i < numCPU; i++) {
-      const worker = new Worker(path.resolve(__dirname, './worker.js'))
-      const subChannel = new MessageChannel()
-      try {
-        worker.postMessage(
-          {
-            command: Commands.INIT,
-            id: i,
-            data: {
-              port: subChannel.port1,
-              memory: wasmMemory,
-            },
-          },
-          [subChannel.port1]
-        )
-
-        subChannel.port2.on('message', value => {
-          console.log('[main] received:', value)
-          const { event, id } = value
-          const workerInfo = workers[id]
-          switch (event) {
-            case Events.INITED:
-              numReady++
-              if (numReady === workers.length) {
-                resolve()
-              }
-              break
-            case Events.FINISHED:
-              if (numTasksDone === totalTasks) {
-                console.log(chalk.green('All tasks done'))
-              }
-              break
-          }
-          workerInfo.busy = false
-        })
-
-        workers.push({ id: i, worker, port: subChannel.port2, busy: true })
-        // await sleep()
-      } catch (e) {
-        console.error(e)
-        return reject()
-      }
+    _resolve = resolve
+    _reject = reject
+    for (let i = 0; i < numWorker; i++) {
+      const workerInfo = createWorker(i)
+      workers.push(workerInfo)
     }
+    initWorker(0)
   })
 }
 
@@ -88,13 +114,14 @@ async function doWork() {
     workerInfo.busy = true
     workerInfo.worker.postMessage({
       command: Commands.RUN,
+      id: workerInfo.id,
       task: tasks.pop(),
     })
   })
 }
 
 initialize()
-  .then(doWork)
+  .then(() => doWork())
   .catch(error => {
     console.log(
       `${chalk.bgRed(chalk.white(' ERROR '))} ${chalk.red(

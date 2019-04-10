@@ -2,16 +2,16 @@
 /**
  * Author : Nidin Vinayakan <01@01alchemist.com>
  */
-import launch from './launch-base'
-import * as minimist from 'minimist'
-import * as path from 'path'
-import chalk from 'chalk'
+const { launch } = require('./launch-base')
+const minimist = require('minimist')
+const path = require('path')
+const chalk = require('chalk')
 
 const args = process.argv.slice(2)
 const options = minimist(args)
-
 const base = path.resolve(__dirname, '../')
-;(async () => {
+
+async function compile() {
   try {
     await launch({
       cwd: options.cwd,
@@ -42,4 +42,5 @@ const base = path.resolve(__dirname, '../')
     console.error(e)
     process.exit(1)
   }
-})()
+}
+compile()
