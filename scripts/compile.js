@@ -6,14 +6,22 @@ const { launch } = require('./launch-base')
 const minimist = require('minimist')
 const path = require('path')
 const chalk = require('chalk')
+const { env } = require('./env')
 
 const args = process.argv.slice(2)
 const options = minimist(args)
-const base = path.resolve(__dirname, '../')
+
+const _features = env('ASC_FEATURES', '')
+const features = _features.length > 0 ? ['--enable=' + _features] : []
+console.log(chalk.green('Enabled features:', _features))
+
+const opt = (options, name, extra = []) =>
+  options[name] ? ['--' + name, ...extra] : []
 
 async function compile() {
   try {
     await launch({
+      shell: true,
       cwd: options.cwd,
       cmds: [
         'asc',
@@ -22,16 +30,16 @@ async function compile() {
         options.o,
         '-t',
         options.o.replace('.wasm', '.wat'),
-        // '--importMemory',
         '--sourceMap',
         // '--validate',
+        // '--importMemory',
         ...(options.sharedMemory
           ? ['--sharedMemory', options.sharedMemory, '--memoryBase 8']
           : []),
-        '--enable',
-        'threads',
-        ...(options.debug ? ['--debug'] : []),
-        ...(options.optimize ? ['--optimize'] : []),
+        ...features,
+        ...opt(options, 'sharedMemory', ),
+        ...opt(options, 'debug'),
+        ...opt(options, 'optimize'),
       ],
     })
   } catch (e) {
@@ -43,4 +51,5 @@ async function compile() {
     process.exit(1)
   }
 }
+
 compile()

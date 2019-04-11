@@ -2,19 +2,10 @@ const spawn = require('child_process').spawn
 const minimist = require('minimist')
 const path = require('path')
 const fs = require('fs')
+const { loadEnv } = require('./env')
 
 const baseDir = path.resolve(__dirname, '../')
-let envPath = `${baseDir}/env/${process.env.USER}.env`
-if (!fs.existsSync(envPath)) {
-  envPath = `${baseDir}/.env`
-}
-
-const EnvFile = envPath
-
-console.log(`Loading env vars from: ${envPath}`)
-require('dotenv').config({
-  path: envPath,
-})
+const EnvFile = loadEnv(baseDir)
 
 async function launch(options) {
   options = options || minimist(process.argv.slice(2))
