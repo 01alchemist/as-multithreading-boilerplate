@@ -1,19 +1,18 @@
 import { AL_MASK, MAX_SIZE_32 } from 'internal/allocator'
 
-var startOffset: usize = (HEAP_BASE + AL_MASK) & ~AL_MASK
-var offset_ptr: usize = startOffset
-var TOP = (HEAP_BASE + 8 + AL_MASK) & ~AL_MASK
-store<usize>(offset_ptr, TOP)
+declare function logi(arg: i32): void
 
-@global export function allocator_get_offset(): usize {
-  return atomic.load<usize>(offset_ptr)
+var startOffset: usize = (HEAP_BASE + AL_MASK) & ~AL_MASK
+var offsetPtr: usize = startOffset
+var START_TOP = (HEAP_BASE + 8 + AL_MASK) & ~AL_MASK
+var MEMORY_TOP = atomic.load<usize>(offsetPtr)
+
+if (MEMORY_TOP === 0) {
+  atomic.store<usize>(offsetPtr, START_TOP)
 }
 
-@global export function allocator_set_offset(
-  old_offset: usize,
-  new_offset: usize
-): usize {
-  return atomic.cmpxchg<usize>(offset_ptr, old_offset, new_offset)
+@global @inline export function allocator_get_offset(): usize {
+  return atomic.load<usize>(offsetPtr)
 }
 
 @global export function __memory_allocate(size: usize): usize {
@@ -35,7 +34,7 @@ store<usize>(offset_ptr, TOP)
         }
       }
     } while (
-      atomic.cmpxchg<usize>(offset_ptr, currentOffset, top) != currentOffset
+      atomic.cmpxchg<usize>(offsetPtr, currentOffset, top) != currentOffset
     )
 
     return currentOffset
@@ -50,5 +49,5 @@ store<usize>(offset_ptr, TOP)
 }
 
 @global export function __memory_reset(): void {
-  atomic.store<usize>(offset_ptr, startOffset)
+  atomic.store<usize>(offsetPtr, startOffset)
 }

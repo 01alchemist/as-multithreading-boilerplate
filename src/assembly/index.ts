@@ -1,12 +1,12 @@
 import './allocator'
 
-var contextId: i32 = 0
 class Context {
-  id: i32
+  pixels: Uint8Array
   constructor() {
-    this.id = contextId++
+    this.pixels = new Uint8Array(10)
   }
 }
+
 var currentContext: Context = null
 export function createContext(): Context {
   currentContext = new Context()
@@ -18,4 +18,24 @@ export function getContext(): Context {
 export function setContext(context: Context): Context {
   currentContext = context
   return currentContext
+}
+
+export function getPixels(): Uint8Array {
+  return currentContext.pixels
+}
+
+export function setPixels(p: Uint8Array): void {
+  currentContext.pixels = p
+}
+
+export function getMemoryOffset(): usize {
+  return allocator_get_offset()
+}
+
+class Locals {
+  var1:i32 = 0;
+  constructor(){}
+}
+export function createLocals():Locals {
+  return new Locals()
 }

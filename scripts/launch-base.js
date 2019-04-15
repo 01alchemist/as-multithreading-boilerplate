@@ -2,7 +2,7 @@ const spawn = require('child_process').spawn
 const minimist = require('minimist')
 const path = require('path')
 const fs = require('fs')
-const { loadEnv } = require('./env')
+const { loadEnv } = require('../src/common/env')
 
 const baseDir = path.resolve(__dirname, '../')
 const EnvFile = loadEnv(baseDir)
