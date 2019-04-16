@@ -8,28 +8,13 @@ const chalk = require('chalk')
 const {
   Worker,
   MessageChannel,
-  MessagePort,
-  isMainThread,
-  parentPort,
 } = require('worker_threads')
 const os = require('os')
 const { loadEnv } = require('../common/env')
 loadEnv('.');
-const { Commands, Events, sleep } = require('../common')
 const WorkerManager = require('../common/worker-manager')
 const JobManager = require('../common/job-manager')
 
-const numWorker = os.cpus().length - 1
-let numWorkerReady = 0
-let _resolve, _reject
-let context = null
-let workers = []
-let numTasksDone = 0
-const tasks = [
-  { id: 0, data: [1, 1, 1, 1, 1] },
-  { id: 1, data: [2, 2, 2, 2, 2] },
-]
-const totalTasks = tasks.length
 const params = { tileSize: 64, width: 600, height: 400 }
 
 function createWorker(id, onWorkerMessage) {
