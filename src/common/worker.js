@@ -29,7 +29,11 @@ module.exports = {
           }
 
           if(payload.wasmLibModule){
+            wasmLibModule = payload.wasmLibModule
+          }
 
+          if(payload.wasmModule){
+            wasmModule = payload.wasmModule
           }
 
           const lib = await WebAssembly.instantiate(wasmLibModule, {
