@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 /**
  * Author : Nidin Vinayakan <01@01alchemist.com>
  */

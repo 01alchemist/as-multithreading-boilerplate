@@ -9,7 +9,6 @@ function initialize(params) {
 }
 
 class Profiler {
-  
   constructor() {
     this.startTime = null
     this.duration = null

@@ -1,5 +1,7 @@
 import './allocator'
-
+/**
+ * Shared context, this will be shared between workers
+ */
 class Context {
   pixels: Uint8Array
   constructor() {
@@ -20,6 +22,9 @@ export function setContext(context: Context): Context {
   return currentContext
 }
 
+/**
+ * Get pixels data
+ */
 export function getPixels(): Uint8Array {
   return currentContext.pixels
 }
@@ -28,14 +33,13 @@ export function setPixels(p: Uint8Array): void {
   currentContext.pixels = p
 }
 
-export function getMemoryOffset(): usize {
-  return allocator_get_offset()
-}
-
-class Locals {
+/**
+ * Local context
+ */
+class LocalContext {
   var1:i32 = 0;
   constructor(){}
 }
-export function createLocals():Locals {
-  return new Locals()
+export function createLocalContext():LocalContext {
+  return new LocalContext()
 }
