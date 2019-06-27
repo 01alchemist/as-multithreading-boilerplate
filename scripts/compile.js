@@ -32,12 +32,11 @@ async function compile() {
         options.o.replace('.wasm', '.wat'),
         '--sourceMap',
         // '--validate',
-        // '--importMemory',
+        '--importMemory',
         ...(options.sharedMemory
-          ? ['--sharedMemory', options.sharedMemory, '--memoryBase 8']
+          ? ['--sharedMemory', options.sharedMemory, '--memoryBase 16']
           : []),
         ...features,
-        ...opt(options, 'sharedMemory', ),
         ...opt(options, 'debug'),
         ...opt(options, 'optimize'),
       ],

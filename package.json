@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --experimental-wasm-threads --experimental-worker ./src/node/index.js",
     "debug": "node --inspect-brk --experimental-wasm-threads --experimental-worker ./src/node/index.js",
-    "compile": "./scripts/compile.js --sharedMemory=256",
+    "compile": "./scripts/compile.js --sharedMemory=16384",
     "asbuild:untouched": "yarn compile src/assembly/index.ts -o build/untouched.wasm --debug",
     "asbuild:optimized": "yarn compile src/assembly/index.ts -o build/optimized.wasm --optimize",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
