@@ -33,6 +33,6 @@
     "assemblyscript": "AssemblyScript/assemblyscript",
     "chalk": "^2.4.2",
     "dotenv": "^7.0.0",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.6"
   }
 }
